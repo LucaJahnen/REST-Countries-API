@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <title>Rest Countries API</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="main.js" defer></script>
+    <script type="module" src="animation.js" defer></script>
+  </head>
+  <body>
+    <nav class="navbar">
+      <h1>Where in the world?</h1>
+      <button class="theme-switch">
+        <div class="icon-wrapper">
+          <ion-icon class="moon" name="moon"></ion-icon>
+          <ion-icon class="sun" name="sunny"></ion-icon>
+        </div>
+        <p>Dark Mode</p>
+      </button>
+    </nav>
+    <main>
+      <form class="form">
+        <div class="input-wrapper">
+          <ion-icon class="icon" name="search-outline"></ion-icon>
+          <label class="label" for="search">Search a country</label>
+          <input id="search" class="search" type="text" placeholder="Search for a country..." />
+        </div>
+        <div class="dropdown-container">
+          <div tabindex="0" class="dropdown-wrapper">
+          <div class="btn-wrapper">
+            <button type="button" id="btn-main">Filter by Region
+            </button>
+            <ion-icon class="arrow" name="chevron-down-outline"></ion-icon>
+          </div>
+          <div class="options">
+            <button type="button">Africa</button>
+            <button type="button">America</button>
+            <button type="button">Asia</button>
+            <button type="button">Europe</button>
+            <button type="button">Oceania</button>
+          </div>
+        </div> 
+      </div>
+      </form>
+      <div id="root">
+        
+      </div>
+    </main>
+    <script 
+      type="module" 
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js">
+    </script>
+    <script nomodule 
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js">
+    </script>
+    <script 
+      src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js" 
+      integrity="sha512-f8mwTB+Bs8a5c46DEm7HQLcJuHMBaH/UFlcgyetMqqkvTcYg4g5VXsYR71b3qC82lZytjNYvBj2pf0VekA9/FQ==" 
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer">
+    </script>
+  </body>
+</html>
