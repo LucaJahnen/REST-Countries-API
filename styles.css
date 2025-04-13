@@ -47,7 +47,11 @@ main {
     background-color: var(--bg);
 
     form {
-        label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .search-label {
             position: relative;
     
             ion-icon {
@@ -58,7 +62,7 @@ main {
             }
     
             input {
-                width: 38%;
+                width: 33.5vw;
                 padding: 1.4rem 1.2rem 1.4em 4.8rem;
                 border-radius: 0.3rem;
                 border: none;
@@ -66,42 +70,101 @@ main {
                 font-size: 0.9rem;
             }
         }
-    }
 
-    #root {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        grid-column-gap: 5vw;
-        grid-row-gap: 5vw;
-        padding-top: 3.2rem;
+        
+        .select-label {
+            position: relative;
+            border-radius: 0.3rem;
+            border: none;
+            box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+            font-size: 0.9rem;
+            cursor: pointer;
 
-        .card {
-            box-shadow: 0px 2px 4px 4px rgba(0,0,0,0.05);
-            border-radius: 0.5rem;
+            ion-icon {
+                position: absolute;
+                right: 10%;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+        }
+
+        .select-label {
+            position: relative;
+        }
+
+        .select-region {
+            border: none;
+            padding: 1.2rem 4.6rem 1.2rem 1.5rem;
+            background-color: white;
+            border-radius: 0.3rem;
+            font-size: 0.9rem;
+        }
+
+        .option-container {
+            position: absolute;
+            top: 110%;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            border-radius: 0.3rem;
+            box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+            visibility: hidden;
+
+            button:nth-child(1) {
+                border-radius: 0.3rem 0.3rem 0 0;
+                padding-top: 1rem;
+            }
+
+            button:last-child {
+                border-radius: 0 0 0.3rem 0.3rem;
+                padding-bottom: 0.6rem;
+            }
 
             button {
-                display: flex;
-                flex-direction: column;
+                background-color: white;
                 text-align: left;
-                padding-bottom: 1.4rem;
+                padding: 0.25rem 1.4rem;
+                font-size: 0.9rem;
+            }
+        }
+    }
+}
 
-                img {
-                    width: 100%;
-                    border-radius: 0.5rem 0.5rem 0 0;
+#root {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-column-gap: 5vw;
+    grid-row-gap: 5vw;
+    padding-top: 3.2rem;
+
+    .card {
+        box-shadow: 0px 2px 4px 4px rgba(0,0,0,0.05);
+        border-radius: 0.5rem;
+
+        button {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            padding-bottom: 1.4rem;
+
+            img {
+                width: 100%;
+                aspect-ratio: 15 / 9;
+                border-radius: 0.5rem 0.5rem 0 0;
+                object-fit: cover;
+            }
+
+            .text-wrapper {
+                padding: 1.4rem 1.6rem;
+
+                h2 {
+                    font-size: 1.1rem;
+                    margin-bottom: 1rem;
                 }
 
-                .text-wrapper {
-                    padding: 1.4rem 1.6rem;
-
-                    h2 {
-                        font-size: 1.1rem;
-                        margin-bottom: 1rem;
-                    }
-
-                    p {
-                        margin-bottom: 0.2rem;
-                        font-size: 0.9rem;
-                    }
+                p {
+                    margin-bottom: 0.2rem;
+                    font-size: 0.9rem;
                 }
             }
         }

@@ -35,10 +35,37 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 var _this = this;
+var root = document.querySelector("#root");
 var form = document.querySelector(".search-form");
 form.addEventListener("submit", function (e) {
     e.preventDefault();
 });
+var optionContainer = document.querySelector(".option-container");
+var selectButton = document.querySelector(".select-region");
+var visible = false;
+var options = optionContainer.querySelectorAll("button");
+options.forEach(function (option) {
+    option.addEventListener("click", function () {
+        showCountriesByRegion(option.textContent.toLowerCase());
+        selectButton.querySelector("span").textContent = option.textContent;
+    });
+});
+var changeVisibility = function (event) {
+    event.stopPropagation();
+    visible = !visible;
+    if (visible) {
+        optionContainer.style.visibility = "visible";
+    }
+    else {
+        optionContainer.style.visibility = "hidden";
+    }
+};
+document.body.addEventListener("click", function () {
+    visible = false;
+    optionContainer.style.visibility = "hidden";
+});
+selectButton.addEventListener("click", changeVisibility);
+optionContainer.addEventListener("click", changeVisibility);
 var makeRequest = function (query) { return __awaiter(_this, void 0, void 0, function () {
     var url, response, json, error_1;
     return __generator(this, function (_a) {
@@ -66,18 +93,34 @@ var makeRequest = function (query) { return __awaiter(_this, void 0, void 0, fun
         }
     });
 }); };
+var showCountriesByRegion = function (query) { return __awaiter(_this, void 0, void 0, function () {
+    var resp;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, makeRequest("region/" + query)];
+            case 1:
+                resp = _a.sent();
+                root.innerHTML = "";
+                resp.forEach(function (country) {
+                    var formattedCountry = formatResp(country);
+                    renderCard(formattedCountry);
+                });
+                return [2 /*return*/];
+        }
+    });
+}); };
 var getAllCountries = function () { return __awaiter(_this, void 0, void 0, function () {
-    var resp, i, formattedResp;
+    var resp;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, makeRequest("all")];
             case 1:
                 resp = _a.sent();
-                for (i = 10; i < 20; i++) {
-                    formattedResp = formatResp(resp[i]);
-                    renderCard(formattedResp);
-                }
-                console.log(resp);
+                resp.forEach(function (country) {
+                    console.log(country);
+                    var formattedCountry = formatResp(country);
+                    renderCard(formattedCountry);
+                });
                 return [2 /*return*/];
         }
     });
@@ -93,10 +136,9 @@ function formatResp(resp) {
     };
 }
 var renderCard = function (obj) { return __awaiter(_this, void 0, void 0, function () {
-    var template, root;
+    var template;
     return __generator(this, function (_a) {
         template = "\n    <section\" class=\"card\">\n        <button class=\"tab-button\">\n        <img class=\"card-img\" src=\"".concat(obj.flag, "\" alt=\"Flag of ").concat(obj.name, "\" />\n        <div class=\"text-wrapper\">\n            <h2 class=\"card-heading\">").concat(obj.name, "</h2>\n            <p><span>Population:</span> ").concat(obj.population, "</p>\n            <p><span>Region:</span> ").concat(obj.region, "</p>\n            <p><span>Capital:</span> ").concat(obj.capital, "</p>\n        </div>\n    </button>\n   </section> \n   ");
-        root = document.querySelector("#root");
         root.innerHTML += template;
         return [2 /*return*/];
     });

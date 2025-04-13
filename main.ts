@@ -1,7 +1,38 @@
+const root = document.querySelector("#root");
+
 const form: HTMLFormElement = document.querySelector(".search-form");
 form.addEventListener("submit", e => {
     e.preventDefault();
 })
+
+const optionContainer: HTMLDivElement = document.querySelector(".option-container");
+const selectButton: HTMLButtonElement = document.querySelector(".select-region");
+let visible: boolean = false;
+const options = optionContainer.querySelectorAll("button");
+
+options.forEach(option => {
+    option.addEventListener("click", () => {
+        showCountriesByRegion(option.textContent.toLowerCase());
+        selectButton.querySelector("span").textContent = option.textContent;
+    });
+})
+
+const changeVisibility = (event: MouseEvent) => {
+    event.stopPropagation()
+    visible = !visible;
+    if(visible) {
+        optionContainer.style.visibility = "visible";
+    } else {
+        optionContainer.style.visibility = "hidden";
+    }
+}
+
+document.body.addEventListener("click", () => {
+    visible = false;
+    optionContainer.style.visibility = "hidden";
+});
+selectButton.addEventListener("click", changeVisibility);
+optionContainer.addEventListener("click", changeVisibility);
 
 interface FormattedCountry {
     flag: string;
@@ -35,13 +66,22 @@ const makeRequest = async (query: string) => {
     }
 }
 
+const showCountriesByRegion = async (query: string) => {
+    const resp = await makeRequest("region/" + query);
+    root.innerHTML = "";
+    resp.forEach(country => {
+        const formattedCountry = formatResp(country);
+        renderCard(formattedCountry);
+    })
+}
+
 const getAllCountries = async () => {
     const resp = await makeRequest("all");
-    for(let i = 10; i < 20; i++) {
-        const formattedResp = formatResp(resp[i]);
-        renderCard(formattedResp);
-    }
-    console.log(resp);
+    resp.forEach(country => {
+        console.log(country);
+        const formattedCountry = formatResp(country);
+        renderCard(formattedCountry);
+    })
 }
 
 getAllCountries();
@@ -70,7 +110,5 @@ const renderCard = async (obj: FormattedCountry) => {
     </button>
    </section> 
    `
-
-    const root = document.querySelector("#root");
     root.innerHTML += template;
 }
