@@ -13,6 +13,14 @@
     box-sizing: border-box;
 }
 
+button {
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
 body, button {
     font-family: "Nunito Sans", sans-serif;
     font-optical-sizing: auto;
@@ -28,19 +36,14 @@ nav {
     width: 100%;
 
     button {
-        border: none;
-        background-color: transparent;
         display: flex;
         align-items: center;
         gap: 0.6rem;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 1rem;
     }
 }
 
 main {
-    padding: 3.5rem 4.9rem;
+    padding: 2.8rem 4.9rem;
     background-color: var(--bg);
 
     form {
@@ -50,16 +53,56 @@ main {
             ion-icon {
                 position: absolute;
                 top: 50%;
-                left: 1.6rem;
+                left: 2rem;
                 transform: translateY(-50%);
             }
     
             input {
-                width: 35%;
-                padding: 1.2rem 1.2rem 1.2em 3.4rem;
-                border-radius: 0.2rem;
+                width: 38%;
+                padding: 1.4rem 1.2rem 1.4em 4.8rem;
+                border-radius: 0.3rem;
                 border: none;
                 box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+                font-size: 0.9rem;
+            }
+        }
+    }
+
+    #root {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-column-gap: 5vw;
+        grid-row-gap: 5vw;
+        padding-top: 3.2rem;
+
+        .card {
+            box-shadow: 0px 2px 4px 4px rgba(0,0,0,0.05);
+            border-radius: 0.5rem;
+
+            button {
+                display: flex;
+                flex-direction: column;
+                text-align: left;
+                padding-bottom: 1.4rem;
+
+                img {
+                    width: 100%;
+                    border-radius: 0.5rem 0.5rem 0 0;
+                }
+
+                .text-wrapper {
+                    padding: 1.4rem 1.6rem;
+
+                    h2 {
+                        font-size: 1.1rem;
+                        margin-bottom: 1rem;
+                    }
+
+                    p {
+                        margin-bottom: 0.2rem;
+                        font-size: 0.9rem;
+                    }
+                }
             }
         }
     }
