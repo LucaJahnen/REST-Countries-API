@@ -1,8 +1,58 @@
 const root = document.querySelector("#root");
 
 const form: HTMLFormElement = document.querySelector(".search-form");
-form.addEventListener("submit", e => {
+form.addEventListener("submit", async (e: SubmitEvent) => {
     e.preventDefault();
+
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const value = formData.get("search") as string;
+    const resp = await makeRequest(`name/${value.toLowerCase()}?fullText=true`);
+    if(resp !== undefined) {
+        root.innerHTML = "";
+        const formattedCountry = formatResp(resp[0]);
+        renderCard(formattedCountry);
+    }
+})
+
+const makeRequest = async (query: string) => {
+    const url: string = "https://restcountries.com/v3.1/";
+    try {
+        const response = await fetch(url + query);
+        if(!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+
+        const json = await response.json();
+        return json
+    } catch (error) {
+        console.log(error.message);
+
+        root.innerHTML = `<div class='error-info'>
+                <h3>404</h3>
+                <h4>Oops!</h4>
+                <p>The country you're looking for could not be found. Make sure your spelling is correct.</p>
+            </div>`
+    }
+}
+
+const getAllCountries = async () => {
+    const resp = await makeRequest("all");
+    resp.forEach(country => {
+        const formattedCountry = formatResp(country);
+        renderCard(formattedCountry);
+    })
+}
+
+getAllCountries();
+
+const searchInput = document.querySelector("#search") as HTMLInputElement | null;
+
+searchInput.addEventListener("input", (e: Event) => {
+    if(searchInput && searchInput.value === "") {
+        root.innerHTML = "";
+        getAllCountries();
+    }
 })
 
 const optionContainer: HTMLDivElement = document.querySelector(".option-container");
@@ -50,22 +100,6 @@ interface Response {
     capital: string;
 }
 
-
-const makeRequest = async (query: string) => {
-    const url: string = "https://restcountries.com/v3.1/";
-    try {
-        const response = await fetch(url + query);
-        if(!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-        }
-
-        const json = await response.json();
-        return json
-    } catch (error) {
-        console.log(error.message)
-    }
-}
-
 const showCountriesByRegion = async (query: string) => {
     const resp = await makeRequest("region/" + query);
     root.innerHTML = "";
@@ -74,17 +108,6 @@ const showCountriesByRegion = async (query: string) => {
         renderCard(formattedCountry);
     })
 }
-
-const getAllCountries = async () => {
-    const resp = await makeRequest("all");
-    resp.forEach(country => {
-        console.log(country);
-        const formattedCountry = formatResp(country);
-        renderCard(formattedCountry);
-    })
-}
-
-getAllCountries();
 
 function formatResp(resp: Response): FormattedCountry {
     return {
@@ -98,7 +121,7 @@ function formatResp(resp: Response): FormattedCountry {
 
 const renderCard = async (obj: FormattedCountry) => {
     const template = `
-    <section" class="card">
+    <section class="card">
         <button class="tab-button">
         <img class="card-img" src="${obj.flag}" alt="Flag of ${obj.name}" />
         <div class="text-wrapper">
