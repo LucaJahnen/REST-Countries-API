@@ -115,7 +115,7 @@ function formatResp(resp: Response): FormattedCountry {
         name: resp.name.common,
         population: resp.population.toLocaleString("en-US"),
         region: resp.region,
-        capital: resp.capital[0]
+        capital: resp.capital?.[0] ?? "No data"
     }
 }
 

@@ -74,6 +74,7 @@ main {
                 border: none;
                 box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
                 font-size: 0.9rem;
+                color: var(--input);
             }
         }
 
@@ -104,6 +105,7 @@ main {
             background-color: white;
             border-radius: 0.3rem;
             font-size: 0.9rem;
+            font-weight: normal;
         }
 
         .option-container {
@@ -131,6 +133,7 @@ main {
                 text-align: left;
                 padding: 0.25rem 1.4rem;
                 font-size: 0.9rem;
+                font-weight: normal;
             }
         }
     }
@@ -156,7 +159,7 @@ main {
 
             img {
                 width: 100%;
-                aspect-ratio: 15 / 9;
+                aspect-ratio: 5 / 3;
                 border-radius: 0.5rem 0.5rem 0 0;
                 object-fit: cover;
             }
@@ -197,6 +200,54 @@ main {
             max-width: 40ch;
             margin-top: 1.2rem;
             line-height: 1.6;
+        }
+    }
+}
+
+@media screen and (max-width: 760px) {
+    nav {
+        padding: 1.5rem 1.4rem;
+
+        h1 {
+            font-size: 1rem;
+        }
+
+        button {
+            font-size: 1rem;
+        }
+    }
+
+    main {
+        padding: 1.6rem 1.4rem;
+
+        form {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 2.4rem;
+
+            .search-label {
+                width: 100%;
+
+                input {
+                    width: 100%;
+                    padding: 1.1rem 1.2rem 1.1em 4.8rem;
+                }
+            }
+
+            .select-region {
+                padding: 1rem 4.6rem 1rem 1.5rem;
+            }
+        }
+    }
+    
+    #root {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-row-gap: 10vw;
+        padding-top: 2.4rem;
+
+        .error-info {
+            top: 60%;
         }
     }
 }
