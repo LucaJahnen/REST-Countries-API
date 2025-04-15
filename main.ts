@@ -1,5 +1,25 @@
 const root = document.querySelector("#root");
 
+const toggleButton: HTMLButtonElement = document.querySelector(".toggle-theme");
+const body = document.body;
+const icon = toggleButton.querySelector("ion-icon") as HTMLElement & { name: string };
+const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+if(prefersDarkMode) {
+    body.classList.add("dark");
+    icon.name = "moon";
+}
+
+toggleButton.addEventListener("click", () => {
+    if(body.classList.contains("dark")) {
+        body.classList.remove("dark");
+        icon.name = "moon-outline";
+    } else {
+        body.classList.add("dark");
+        icon.name = "moon";
+    }
+})
+
 const form: HTMLFormElement = document.querySelector(".search-form");
 form.addEventListener("submit", async (e: SubmitEvent) => {
     e.preventDefault();
