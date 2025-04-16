@@ -1,5 +1,6 @@
 const root = document.querySelector("#root");
 
+// toggle between dark and light mode
 const toggleButton: HTMLButtonElement = document.querySelector(".toggle-theme");
 const body = document.body;
 const icon = toggleButton.querySelector("ion-icon") as HTMLElement & { name: string };
@@ -20,6 +21,7 @@ toggleButton.addEventListener("click", () => {
     }
 })
 
+// search for countriess
 const form: HTMLFormElement = document.querySelector(".search-form");
 form.addEventListener("submit", async (e: SubmitEvent) => {
     e.preventDefault();
@@ -56,27 +58,29 @@ const makeRequest = async (query: string) => {
     }
 }
 
-const getAllCountries = async () => {
+// display all countries when input is empty
+const searchInput = document.querySelector("#search") as HTMLInputElement | null;
+searchInput.addEventListener("input", (e: Event) => {
+    if(searchInput && searchInput.value === "") {
+        root.innerHTML = "";
+        displayAllCountries();
+    }
+})
+
+const displayAllCountries = async () => {
     root.innerHTML = "";
     form.style.display = "flex";
-    const resp = await makeRequest("all");
-    resp.forEach(country => {
+    searchInput.value = "";
+    const resp = await makeRequest("all?fields=flags,name,population,region,capital");
+    resp.forEach((country: Response) => {
         const formattedCountry = formatResp(country);
         renderCard(formattedCountry);
     })
 }
 
-getAllCountries();
+displayAllCountries();
 
-const searchInput = document.querySelector("#search") as HTMLInputElement | null;
-
-searchInput.addEventListener("input", (e: Event) => {
-    if(searchInput && searchInput.value === "") {
-        root.innerHTML = "";
-        getAllCountries();
-    }
-})
-
+// select a region
 const optionContainer: HTMLDivElement = document.querySelector(".option-container");
 const selectButton: HTMLButtonElement = document.querySelector(".select-region");
 let visible: boolean = false;
@@ -148,7 +152,7 @@ interface Response {
 const showCountriesByRegion = async (query: string) => {
     const resp = await makeRequest("region/" + query);
     root.innerHTML = "";
-    resp.forEach(country => {
+    resp.forEach((country: Response) => {
         const formattedCountry = formatResp(country);
         renderCard(formattedCountry);
     })
@@ -164,23 +168,19 @@ function formatResp(resp: Response): FormattedCountry {
     }
 }
 
-function formatDetailedResp(resp: Response[]): FormattedDetailedCountry {
+async function formatDetailedResp(resp: Response[]) {
     const lastIndex = Object.values(resp[0].name.nativeName).length - 1
     const nativeName = Object.values(resp[0].name.nativeName)[lastIndex].common
+    let borderCountries = await Promise.all(resp[0].borders.map(async (borderCountry: string) => {
+            const countryName = await makeRequest("alpha/" + borderCountry + "?fields=name");
+            const name = countryName.name.common;
+            return `<button onclick="renderDetailedCountry('${name}')">${name}</button>`;
+        })
+    )
 
     return {
-        flag: resp[0].flags.svg,
-        name: resp[0].name.common,
         nativeName: nativeName,
-        population: resp[0].population.toLocaleString("en-US"),
-        region: resp[0].region,
-        subRegion: resp[0].subregion ?? "No data",
-        capital: resp[0].capital,
-        topLevelDomain: resp[0].tld ?? ["No data"],
-        currencies: Object.values(resp[0].currencies).map((currency: { name: string }) => currency.name),
-        // currencies: Object.values(resp[0].currencies),
-        languages: Object.values(resp[0].languages).join(", "),
-        borderCountries: resp[0].borders
+        borderCountries: Array.isArray(borderCountries) && borderCountries.length !== 0 ? borderCountries.join("") : "No border countries"
     }
 }
 
@@ -203,42 +203,32 @@ const renderCard = async (obj: FormattedCountry) => {
 }
 
 const renderDetailedCountry = async (name: string) => {
-    let obj = await makeRequest(`name/${name.toLowerCase()}?fullText=true`);
-    obj = formatDetailedResp(obj);
+    const resp = await makeRequest(`name/${name.toLowerCase()}?fullText=true&fields=flags,name,nativeName,population,region,subregion,capital,tld,currencies,languages,borders`);
+    const obj: Response = resp[0];
+    const formattedObj = await formatDetailedResp(resp);
     form.style.display = "none";
-
-    let borderCountries = obj.borderCountries ? await Promise.all(obj.borderCountries.map(async (borderCountry: string) => {
-            const countryName = await makeRequest("alpha/" + borderCountry);
-            const name = countryName[0].name.common;
-            return `<button onclick="renderDetailedCountry('${name}')">${name}</button>`;
-        })
-    ) : "No border countries"
-
-    if(Array.isArray(borderCountries)) {
-        borderCountries = borderCountries.join("");
-    }
 
     const template = `
     <div class="detailed-card">
-        <button class="back-button" onclick="getAllCountries()">
+        <button class="back-button" onclick="displayAllCountries()">
             <ion-icon name="arrow-back-outline"></ion-icon>
             <span>Back</span>
         </button>
         <div class="main-card">
-            <img src="${obj.flag}" alt="Flag of ${obj.name}">
+            <img src="${obj.flags.svg}" alt="Flag of ${obj.name.common}">
             <section>
-                <h1>${obj.name}</h1>
-                <p>Native Name: ${obj.nativeName}</p>
-                <p>Top level domain: ${obj.topLevelDomain.join(", ")}</p>
-                <p>Population: ${obj.population}</p>
-                <p>Currencies: ${obj.currencies.join(", ")}</p>
-                <p>Region: ${obj.region}</p>
-                <p>Languages: ${obj.languages}</p>
-                <p>Sub Region: ${obj.subRegion}</p>
-                <p>Capital: ${obj.capital.join(", ")}</p>
+                <h1>${obj.name.common}</h1>
+                <p><span>Native Name:</span> ${formattedObj.nativeName}</p>
+                <p><span>Top level domain:</span> ${obj.tld.join(", ")}</p>
+                <p><span>Population:</span> ${obj.population.toLocaleString("en-US")}</p>
+                <p><span>Currencies:</span> ${Object.values(obj.currencies).map((currency: { name: string }) => currency.name).join(", ")}</p>
+                <p><span>Region:</span> ${obj.region}</p>
+                <p><span>Languages:</span> ${Object.values(obj.languages).join(", ")}</p>
+                <p><span>Sub Region:</span> ${obj.subregion ?? "No data"}</p>
+                <p><span>Capital:</span> ${obj?.capital?.join(", ")}</p>
             </section>
             <div>
-                <p><span>Border Countries:</span>${borderCountries}</p>
+                <p><span>Border Countries:</span>${formattedObj.borderCountries}</p>
             </div>
         </div>
     </div>
