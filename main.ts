@@ -171,7 +171,7 @@ function formatResp(resp: Response): FormattedCountry {
 async function formatDetailedResp(resp: Response[]) {
     const lastIndex = Object.values(resp[0].name.nativeName).length - 1
     const nativeName = Object.values(resp[0].name.nativeName)[lastIndex].common
-    let borderCountries = await Promise.all(resp[0].borders.map(async (borderCountry: string) => {
+    const borderCountries = await Promise.all(resp[0].borders.map(async (borderCountry: string) => {
             const countryName = await makeRequest("alpha/" + borderCountry + "?fields=name");
             const name = countryName.name.common;
             return `<button onclick="renderDetailedCountry('${name}')">${name}</button>`;
