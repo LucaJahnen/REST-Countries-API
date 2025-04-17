@@ -83,6 +83,7 @@ displayAllCountries();
 // select a region
 const optionContainer: HTMLDivElement = document.querySelector(".option-container");
 const selectButton: HTMLButtonElement = document.querySelector(".select-region");
+const chevronDown: HTMLElement = selectButton.querySelector("ion-icon");
 let visible: boolean = false;
 const options = optionContainer.querySelectorAll("button");
 
@@ -98,14 +99,26 @@ const changeVisibility = (event: MouseEvent) => {
     visible = !visible;
     if(visible) {
         optionContainer.style.visibility = "visible";
+        optionContainer.style.opacity = "1";
+        optionContainer.style.transform = "translateY(0)";
+
+        chevronDown.style.transform = "rotate(180deg) translateY(-50%)";
     } else {
         optionContainer.style.visibility = "hidden";
+        optionContainer.style.opacity = "0";
+        optionContainer.style.transform = "translateY(-1rem)";
+
+        chevronDown.style.transform = "rotate(0) translateY(-50%)";
     }
 }
 
 document.body.addEventListener("click", () => {
     visible = false;
     optionContainer.style.visibility = "hidden";
+    optionContainer.style.opacity = "0";
+    optionContainer.style.transform = "translateY(-1rem)";
+
+    chevronDown.style.transform = "rotate(0) translateY(-50%)";
 });
 selectButton.addEventListener("click", changeVisibility);
 optionContainer.addEventListener("click", changeVisibility);
