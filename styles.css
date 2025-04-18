@@ -24,6 +24,7 @@ button {
     cursor: pointer;
     font-weight: 300;
     font-size: 1rem;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body, button {
@@ -115,6 +116,7 @@ main {
             box-shadow: var(--shadow) 0px 2px 8px 0px;
             font-size: 0.9rem;
             cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
 
             ion-icon {
                 position: absolute;
@@ -150,14 +152,14 @@ main {
             visibility .3s ease allow-discrete;
             transform: translateY(-1rem);
 
-            button:nth-child(1) {
+            button:first-child {
                 border-radius: 0.3rem 0.3rem 0 0;
                 padding-top: 1rem;
             }
 
             button:last-child {
                 border-radius: 0 0 0.3rem 0.3rem;
-                padding-bottom: 0.6rem;
+                padding-bottom: 1rem;
             }
 
             button {
@@ -253,6 +255,7 @@ main {
             border-radius: 0.2rem;
             padding: 0.4rem 2.4rem;
             margin: 5.2rem 0 1rem 0;
+            box-shadow: var(--shadow) 0px 5px 15px;
         }
 
         .main-card {
@@ -299,9 +302,11 @@ main {
                 grid-column: 2 / 3;
                 grid-row: 2 / 3;
                 padding-top: 4.4rem;
+                font-weight: 300;
 
                 span {
                     padding-right: 0.6rem;
+                    font-weight: 600;
                 }
 
                 button {

@@ -29,11 +29,12 @@ form.addEventListener("submit", async (e: SubmitEvent) => {
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
     const value = formData.get("search") as string;
-    const resp = await makeRequest(`name/${value.toLowerCase()}?fullText=true`);
+    const resp = await makeRequest(`name/${value.toLowerCase()}?fullText=true&fields=flags,name,population,region,capital`);
     if(resp !== undefined) {
         root.innerHTML = "";
         const formattedCountry = formatResp(resp[0]);
-        renderCard(formattedCountry);
+        const htmlCard = renderCard(formattedCountry);
+        root.innerHTML = htmlCard;
     }
 })
 
@@ -44,17 +45,15 @@ const makeRequest = async (query: string) => {
         if(!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
-
         const json = await response.json();
         return json
     } catch (error) {
-        console.log(error.message);
-
-        root.innerHTML = `<div class='error-info'>
-                <h3>404</h3>
-                <h4>Oops!</h4>
-                <p>The country you're looking for could not be found. Make sure your spelling is correct.</p>
-            </div>`
+        root.innerHTML = `
+        <div class='error-info'>
+            <h3>404</h3>
+            <h4>Oops!</h4>
+            <p>The country you're looking for could not be found. Make sure your spelling is correct.</p>
+        </div>`
     }
 }
 
@@ -67,15 +66,13 @@ searchInput.addEventListener("input", (e: Event) => {
     }
 })
 
+let allCountries: Response[];
 const displayAllCountries = async () => {
     root.innerHTML = "";
     form.style.display = "flex";
     searchInput.value = "";
-    const resp = await makeRequest("all?fields=flags,name,population,region,capital");
-    resp.forEach((country: Response) => {
-        const formattedCountry = formatResp(country);
-        renderCard(formattedCountry);
-    })
+    allCountries = await makeRequest("all?fields=flags,name,population,region,capital");
+    renderPlaceholders(allCountries);
 }
 
 displayAllCountries();
@@ -94,7 +91,7 @@ options.forEach(option => {
     });
 })
 
-const changeVisibility = (event: MouseEvent) => {
+const toggleVisibility = (event: MouseEvent) => {
     event.stopPropagation()
     visible = !visible;
     if(visible) {
@@ -120,8 +117,8 @@ document.body.addEventListener("click", () => {
 
     chevronDown.style.transform = "rotate(0) translateY(-50%)";
 });
-selectButton.addEventListener("click", changeVisibility);
-optionContainer.addEventListener("click", changeVisibility);
+selectButton.addEventListener("click", toggleVisibility);
+optionContainer.addEventListener("click", toggleVisibility);
 
 interface FormattedCountry {
     flag: string;
@@ -167,7 +164,8 @@ const showCountriesByRegion = async (query: string) => {
     root.innerHTML = "";
     resp.forEach((country: Response) => {
         const formattedCountry = formatResp(country);
-        renderCard(formattedCountry);
+        const htmlCard = renderCard(formattedCountry);
+        root.innerHTML += htmlCard;
     })
 }
 
@@ -181,10 +179,10 @@ function formatResp(resp: Response): FormattedCountry {
     }
 }
 
-async function formatDetailedResp(resp: Response[]) {
-    const lastIndex = Object.values(resp[0].name.nativeName).length - 1
-    const nativeName = Object.values(resp[0].name.nativeName)[lastIndex].common
-    const borderCountries = await Promise.all(resp[0].borders.map(async (borderCountry: string) => {
+async function formatDetailedResp(resp: Response) {
+    const lastIndex = Object.values(resp.name.nativeName).length - 1
+    const nativeName = Object.values(resp.name.nativeName)[lastIndex].common
+    const borderCountries = await Promise.all(resp.borders.map(async (borderCountry: string) => {
             const countryName = await makeRequest("alpha/" + borderCountry + "?fields=name");
             const name = countryName.name.common;
             return `<button onclick="renderDetailedCountry('${name}')">${name}</button>`;
@@ -197,7 +195,7 @@ async function formatDetailedResp(resp: Response[]) {
     }
 }
 
-const renderCard = async (obj: FormattedCountry) => {
+const renderCard = (obj: FormattedCountry) => {
     const template = `
     <section class="card">
         <button class="tab-button" onclick='renderDetailedCountry("${obj.name}")'>
@@ -212,13 +210,13 @@ const renderCard = async (obj: FormattedCountry) => {
    </section> 
    `
 
-    root.innerHTML += template;
+    return template;
 }
 
 const renderDetailedCountry = async (name: string) => {
     const resp = await makeRequest(`name/${name.toLowerCase()}?fullText=true&fields=flags,name,nativeName,population,region,subregion,capital,tld,currencies,languages,borders`);
     const obj: Response = resp[0];
-    const formattedObj = await formatDetailedResp(resp);
+    const formattedObj = await formatDetailedResp(resp[0]);
     form.style.display = "none";
 
     const template = `
@@ -249,3 +247,44 @@ const renderDetailedCountry = async (name: string) => {
 
     root.innerHTML = template;
 }
+
+let placeholders = document.querySelectorAll(".card-placeholder");
+const renderPlaceholders = (countries: Response[]) => {
+    countries.forEach(card => {
+        const placeholder = document.createElement("div");
+        placeholder.className = "card-placeholder";
+        placeholder.style.minHeight = "200px";
+        placeholder.dataset.name = card.name.common;
+        root.appendChild(placeholder);
+    });
+
+    placeholders = document.querySelectorAll(".card-placeholder");
+    placeholders.forEach(el => {
+        observer.observe(el);
+    });
+}
+
+const observer = new IntersectionObserver(
+(entries, obs) => {
+        entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const placeholder = entry.target as HTMLElement;
+            const name = placeholder.dataset.name;
+            const cardData = allCountries.find(c => c.name.common === name);
+            if (cardData) {
+                const formatted = formatResp(cardData);
+                const cardEl = renderCard(formatted);
+                const element = document.createElement("div");
+                element.innerHTML = cardEl;
+                placeholder.replaceWith(element);
+                obs.unobserve(entry.target);
+            }
+        }
+        });
+    },
+    {
+        root: null,
+        rootMargin: "0px",
+        threshold: 0.1,
+    }
+);
