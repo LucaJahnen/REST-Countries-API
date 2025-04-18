@@ -1,5 +1,11 @@
 {
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "npm run clean && tsc && cpx index.html dist && cpx styles.css dist"
+  },
   "devDependencies": {
+    "cpx": "^1.5.0",
+    "rimraf": "^6.0.1",
     "typescript": "^5.8.3"
   }
 }
